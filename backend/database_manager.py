@@ -34,28 +34,28 @@ class DatabaseManager:
             return resultset
             
 
-    def insert_comment(self, course,professor,sentiment_rating,content,link,upvotes):
-        query = "INSERT INTO tReddit_Comments VALUES ('{}','{}',{},'{}','{}',{});".format(course,professor,sentiment_rating,content,link,upvotes)
+    def insert_comment(self, courseId,professor,sentiment_rating,content,link,upvotes):
+        query = "INSERT INTO tReddit_Comments(courseId,professor,sentiment_rating,content,link,upvotes) VALUES ('{}','{}',{},'{}','{}',{});".format(courseId,professor,sentiment_rating,content,link,upvotes)
         self.execute_query(query)
 
     def comments_containing(self, query) -> List[Comment]:
-        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR course LIKE '%{}%';".format(query,query)
+        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%';".format(query,query)
         rowset = self.execute_query(query)
         comments = []
 
         for row in rowset:
-            comments.append(Comment(row[3],row[4],row[5]))
+            comments.append(Comment(row[4],row[5],row[6]))
 
         return comments
 
     def most_upvoted_comments_containing(self, query, n) -> List[Comment]:
-        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR course LIKE '%{}%' ORDER BY upvotes DESC;".format(query,query)
+        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%' ORDER BY upvotes DESC;".format(query,query)
         rowset = self.execute_query(query)
         comments = []
 
         counter = 0
         for row in rowset:
-            comments.append(Comment(row[3],row[4],row[5]))
+            comments.append(Comment(row[4],row[5],row[6]))
             counter += 1
             if counter == n:
                 break
