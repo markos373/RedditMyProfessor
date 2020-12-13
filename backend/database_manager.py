@@ -4,6 +4,9 @@ import psycopg2
 
 class DatabaseManager:
     def __init__(self):
+        '''
+        Initialize database connection
+        '''
         self.host = "localhost"
         self.database = "rmp_db"
         self.user = "rmp_user"
@@ -11,6 +14,9 @@ class DatabaseManager:
         self.conn = psycopg2.connect(host=self.host,database=self.database,user=self.user,password = self.password)
     
     def set_up_tables(self):
+        '''
+        Runs schema.sql to set up database schema
+        '''
         with self.conn.cursor() as cursor:
             with open("../database/schema.sql", "r") as rmp_schema:
                 setup_queries = rmp_schema.read()
@@ -18,6 +24,10 @@ class DatabaseManager:
             self.conn.commit()
 
     def execute_query(self,querystring):
+        '''
+        Execute 'querystring' in database connection defined in initialization.
+        querystring : String
+        '''
         resultset = []
         try:
             cur = self.conn.cursor()
@@ -35,10 +45,23 @@ class DatabaseManager:
             
 
     def insert_comment(self, courseId,professor,sentiment_rating,content,link,upvotes):
+        '''
+        Insert entry to tReddit_Comments in database.
+        courseId : String - course ID, e.g. "CSCI-1100"
+        professor : String - professor name
+        sentiment_rating : float - value produced by sentiment analyzer for that comment
+        content : String - content of the comment
+        link : String - the link
+        upvotes : int - positive or negative integer based on comment votes
+        '''
         query = "INSERT INTO tReddit_Comments(courseId,professor,sentiment_rating,content,link,upvotes) VALUES ('{}','{}',{},'{}','{}',{});".format(courseId,professor,sentiment_rating,content,link,upvotes)
         self.execute_query(query)
 
     def comments_containing(self, query) -> List[Comment]:
+        '''
+        Get all comments containing 'query'
+        query : String - search tReddit_Comments for all comments containing query
+        '''
         query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%';".format(query,query)
         rowset = self.execute_query(query)
         comments = []
@@ -49,6 +72,11 @@ class DatabaseManager:
         return comments
 
     def most_upvoted_comments_containing(self, query, n) -> List[Comment]:
+        '''
+        Get top n comments containing 'query'
+        query : String - search tReddit_Comments for all comments containing query
+        n : int - top n comments to be returned
+        '''
         query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%' ORDER BY upvotes DESC;".format(query,query)
         rowset = self.execute_query(query)
         comments = []
@@ -63,6 +91,9 @@ class DatabaseManager:
         return comments
 
     def populate_db_testing(self):
+        '''
+        Set up database with example comments to test.
+        '''
         self.execute_query("DELETE FROM tReddit_Comments WHERE 1=1") 
         self.insert_comment("cs1","prof1",0,"blah blah", "link", 10)
         self.insert_comment('cs1','goldschmidt',0,'test comment 1 mentions goldschmidt and cs1','https://reddit.com/fake_url_1',5)
