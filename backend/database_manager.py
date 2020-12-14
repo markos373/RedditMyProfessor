@@ -54,16 +54,20 @@ class DatabaseManager:
         link : String - the link
         upvotes : int - positive or negative integer based on comment votes
         '''
-        query = "INSERT INTO tReddit_Comments(courseId,professor,sentiment_rating,content,link,upvotes) VALUES ('{}','{}',{},'{}','{}',{});".format(courseId,professor,sentiment_rating,content,link,upvotes)
-        self.execute_query(query)
+        cur = self.conn.cursor()
+        query = "INSERT INTO tReddit_Comments(courseId,professor,sentiment_rating,content,link,upvotes) VALUES (%s,%s,%s,%s,%s,%s);"
+        cur.execute(query,(courseId,professor,float(sentiment_rating),content,link,int(upvotes)))
 
     def comments_containing(self, query) -> List[Comment]:
         '''
         Get all comments containing 'query'
         query : String - search tReddit_Comments for all comments containing query
         '''
-        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%';".format(query,query)
-        rowset = self.execute_query(query)
+        cur = self.conn.cursor()
+        tquery = "SELECT * FROM tReddit_Comments WHERE professor ILIKE %s OR courseId ILIKE %s;"
+        cur.execute(tquery,(query,query))
+        rowset = cur.fetchall()
+
         comments = []
 
         for row in rowset:
@@ -77,8 +81,10 @@ class DatabaseManager:
         query : String - search tReddit_Comments for all comments containing query
         n : int - top n comments to be returned
         '''
-        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%' ORDER BY upvotes DESC;".format(query,query)
-        rowset = self.execute_query(query)
+        cur = self.conn.cursor()
+        tquery = "SELECT * FROM tReddit_Comments WHERE professor ILIKE %s OR courseId ILIKE %s ORDER BY upvotes DESC;"
+        cur.execute(tquery,(query,query))
+        rowset = cur.fetchall()
         comments = []
 
         counter = 0
