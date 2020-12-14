@@ -54,6 +54,7 @@ class DatabaseManager:
         link : String - the link
         upvotes : int - positive or negative integer based on comment votes
         '''
+        # FIXME: SQL injection
         query = "INSERT INTO tReddit_Comments(courseId,professor,sentiment_rating,content,link,upvotes) VALUES ('{}','{}',{},'{}','{}',{});".format(courseId,professor,sentiment_rating,content,link,upvotes)
         self.execute_query(query)
 
@@ -62,7 +63,8 @@ class DatabaseManager:
         Get all comments containing 'query'
         query : String - search tReddit_Comments for all comments containing query
         '''
-        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%';".format(query,query)
+        # FIXME: SQL injection
+        query = "SELECT * FROM tReddit_Comments WHERE lower(professor) LIKE '%{}%' OR lower(courseId) LIKE '%{}%';".format(query.lower(),query.lower())
         rowset = self.execute_query(query)
         comments = []
 
@@ -77,7 +79,8 @@ class DatabaseManager:
         query : String - search tReddit_Comments for all comments containing query
         n : int - top n comments to be returned
         '''
-        query = "SELECT * FROM tReddit_Comments WHERE professor LIKE '%{}%' OR courseId LIKE '%{}%' ORDER BY upvotes DESC;".format(query,query)
+        # FIXME: SQL injection
+        query = "SELECT * FROM tReddit_Comments WHERE lower(professor) LIKE '%{}%' OR lower(courseId) LIKE '%{}%' ORDER BY upvotes DESC;".format(query.lower(),query.lower())
         rowset = self.execute_query(query)
         comments = []
 
@@ -94,7 +97,7 @@ class DatabaseManager:
         '''
         Set up database with example comments to test.
         '''
-        self.execute_query("DELETE FROM tReddit_Comments WHERE 1=1") 
+        self.execute_query("DELETE FROM tReddit_Comments")
         self.insert_comment("cs1","prof1",0,"blah blah", "link", 10)
         self.insert_comment('cs1','goldschmidt',0,'test comment 1 mentions goldschmidt and cs1','https://reddit.com/fake_url_1',5)
         self.insert_comment('cs1','goldschmidt',0,'test comment 2 mentions goldschmidt and cs1','https://reddit.com/fake_url_2',3)
