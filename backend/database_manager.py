@@ -100,7 +100,7 @@ class DatabaseManager:
         '''
         Set up database with example comments to test.
         '''
-        self.execute_query("DELETE FROM tReddit_Comments WHERE 1=1") 
+        self.execute_query("DELETE FROM tReddit_Comments")
         self.insert_comment("cs1","prof1",0,"blah blah", "link", 10)
         self.insert_comment('cs1','goldschmidt',0,'test comment 1 mentions goldschmidt and cs1','https://reddit.com/fake_url_1',5)
         self.insert_comment('cs1','goldschmidt',0,'test comment 2 mentions goldschmidt and cs1','https://reddit.com/fake_url_2',3)

@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from database_manager import DatabaseManager
 from course_tracker import CourseTracker
 from sentiment_analyzer import SentimentAnalyzer
 import collections
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/word_cloud", methods=['GET'])
