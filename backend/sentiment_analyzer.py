@@ -3,7 +3,6 @@ from google.cloud import language_v1
 
 
 class SentimentAnalyzer:
-    # TODO: Implement this
     def __init__(self):
         pass
 
